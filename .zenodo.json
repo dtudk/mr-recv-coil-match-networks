@@ -1,0 +1,47 @@
+{
+  "upload_type": "software",
+
+  "title": "MR Receive Coil Matching Networks",
+
+  "creators": [
+    {
+      "orcid": "0009-0000-5282-7470",
+      "affiliation": "Technical University of Denmark",
+      "name": "Jepsen, Rasmus Alexander"
+    }
+  ],
+
+  "description": "This repository implements calculations for MRI receive coil matching networks to accompany the research article \"Baluns for Preamplifier Decoupling of Radio-Frequency Receive Coils\" by Rasmus Jepsen, Jan Henrik Ardenkjær-Larsen, and Vitaliy Zhurbenko (submitted). These matching networks provide noise matching, preamplifier decoupling and common-mode rejection. See the README.md file at the root of the repository for more information.",
+
+  "license": "lgpl-2.1-or-later",
+
+  "contributors": [
+    {
+      "orcid": "0000-0001-6167-6926",
+      "affiliation": "Technical University of Denmark",
+      "name": "Ardenkjær-Larsen, Jan Henrik",
+      "type": "Supervisor"
+    },
+    {
+      "orcid": "0000-0002-1515-733X",
+      "affiliation": "Technical University of Denmark",
+      "name": "Zhurbenko, Vitaliy",
+      "type": "Supervisor"
+    }
+  ],
+
+  "references": [
+    "R. A. Jepsen, \"LC Power-Matching Baluns\". Zenodo, Feb. 28, 2024. doi: 10.5281/zenodo.10723786.",
+    "K. Kurokawa, \"Power waves and the scattering matrix,\" IEEE Transactions on Microwave Theory and Techniques, vol. 13, no. 2, pp. 194–202, 1965.",
+    "D. Bockelman and W. Eisenstadt, \"Combined differential and common-mode analysis of power splitters and combiners,\" IEEE Transactions on Microwave Theory and Techniques, vol. 43, no. 11, pp. 2627–2632, 1995.",
+    "W. Wang, V. Zhurbenko, J. D. Sánchez‐Heredia, and J. H. Ardenkjær‐Larsen, \"Trade‐off between preamplifier noise figure and decoupling in MRI detectors,\" Magnetic Resonance in Medicine, vol. 89, no. 2, pp. 859–871, 2023. doi:10.1002/mrm.29489"
+  ],
+
+  "grants": [{"id":"10.13039/501100000780::856432"}],
+
+  "thesis_university": "Technical University of Denmark (DTU)",
+
+  "version": "1.0.0",
+
+  "language": "eng"
+}

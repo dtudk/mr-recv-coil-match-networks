@@ -1,0 +1,7 @@
+/.vscode
+__pycache__
+/.mypy_cache
+/pylintrc
+*.egg-info
+/build
+/dist
