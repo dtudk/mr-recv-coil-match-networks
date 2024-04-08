@@ -1,5 +1,7 @@
 # mr-recv-coil-match-networks
 
+[![DOI](https://zenodo.org/badge/702897388.svg)](https://zenodo.org/badge/latestdoi/702897388)
+
 ## Description
 This repository implements calculations for MRI receive coil matching networks.
 These matching networks provide noise matching, preamplifier decoupling and common-mode rejection.
