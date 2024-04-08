@@ -1,21 +1,21 @@
-"""This file is part of mr-recv-coil-match-networks.
-Copyright © 2024 Technical University of Denmark (developed by Rasmus Jepsen)
+# This file is part of mr-recv-coil-match-networks.
+# Copyright © 2024 Technical University of Denmark (developed by Rasmus Jepsen)
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
-This module performs calculations to calculate parameters for MR radiofrequency receive coil matching networks with optimal noise matching and decoupling.
+"""This module performs calculations to calculate parameters for MR radiofrequency receive coil matching networks with optimal noise matching and decoupling.
 Calculations are from [1].
 [1] W. Wang, V. Zhurbenko, J. D. Sánchez‐Heredia, and J. H. Ardenkjær‐Larsen, "Trade‐off between preamplifier noise figure and decoupling in MRI detectors," Magnetic Resonance in Medicine, vol. 89, no. 2, pp. 859–871, 2023. doi:10.1002/mrm.29489 
 """
