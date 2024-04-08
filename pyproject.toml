@@ -1,6 +1,6 @@
 [project]
 name = "mr-recv-coil-match-networks"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="Rasmus Jepsen", email="rasale@dtu.dk" },
 ]
