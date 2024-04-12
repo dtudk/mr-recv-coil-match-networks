@@ -25,9 +25,16 @@ import numpy as np
 import skrf
 
 class ReceiveCoilMatchingTopology(lc_power_match_baluns.topology.BalunTopology):
-  """A matching network topology for an MR receive coil and a preamplifier"""
+  """A matching network topology for an MR receive coil and a preamplifier
+  
+  Attributes:
+        has_common_mode_rejection Whether the topology is explicitly designed to provide common-mode rejection.
+        has_only_one_solution Whether two solutions of reactance parameters yield equivalent networks for this topology.
+  """
 
   has_common_mode_rejection: bool = False
+
+  has_only_one_solution: bool = False
 
   @classmethod
   def calculate_elements_from_reactance_params(cls, x11: float, x12: float,
@@ -252,6 +259,8 @@ W 0 0_5; down=0.1, ground
 
   has_common_mode_rejection = True
 
+  has_only_one_solution = True
+
   @classmethod
   def calculate_elements_from_reactance_params(cls, x11, x12, x22):
     x1 = (-x11 * x22 + x12 ** 2) / (x12 - 2 * x22)
@@ -288,6 +297,8 @@ W 0 0_5; down=0.1, ground
   num_elements = 5
 
   has_common_mode_rejection = True
+
+  has_only_one_solution = True
 
   @classmethod
   def calculate_elements_from_reactance_params(cls, x11, x12, x22):
