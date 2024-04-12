@@ -102,7 +102,6 @@ class ReceiveCoilMatchingTopology(lc_power_match_baluns.topology.BalunTopology):
     overall_nf_db = 10 * np.log10(overall_nf)
     return overall_nf_db
 
-
 class ExtendedBox1Topology(ReceiveCoilMatchingTopology):
   name = "Extended Box 1"
 
@@ -165,22 +164,17 @@ class ExtendedBox3Topology(ReceiveCoilMatchingTopology):
   name = "Extended Box 3"
   
   netlist = """
-Z2 1_2 2_0; right
-W 2_0 2_4; right
-Z3 2_2 3_3; rotate=225
-W 3_3 3_0; rotate=225
-Z4 3_0 0_3; right
-W 1_0 1_2; right
-W 0_3 0_2; right
-Z1 1_0 3_1; down
-W 3_1 3_0; right
-W 2_4 2_1; right
-Z5 2_1 0_2; down
-W 2_4 2_2; down
-W 1_1 1_0; right
-W 3_2 3_1; right
-W 2_1 2_3; right
-W 0_2 0; right
+Z1 1_1 3_1; down
+Z2 1_1 5_0; right
+Z3 5_0 4_0; down
+Z4 4_0 0_1; right
+Z5 2_1 0_1; down
+W 3_1 4_0; right
+W 5_0 2_1; right
+W 1_0 1_1; right
+W 2_1 2_0; right
+W 3_0 3_1; right
+W 0_1 0; right
 W 0 0_4; down=0.1, ground
 ; label_nodes=none
 """
@@ -339,38 +333,6 @@ W 0 0_5; down=0.1, ground
     x3 = x11 * x22 / x12 - x12
     x4 = x12 * (x11 * x22 - x12 ** 2) / (2 * x12 * x22 + x12 ** 2 - 2 * x11 * x22)
     x5 = x12 + x11 * x22 * (x12 - 2 * x22) / (2 * x12 * x22 + x12 ** 2 - 2 * x11 * x22)
-    return (x1, x2, x3, x4, x5)
-
-class TildeTopology(ReceiveCoilMatchingTopology):
-  name = "Tilde"
-  
-  netlist = """
-Z1 1_1 3_1; down
-Z2 1_1 5_0; right
-Z3 5_0 4_0; down
-Z4 4_0 0_1; right
-Z5 2_1 0_1; down
-W 3_1 4_0; right
-W 5_0 2_1; right
-W 1_0 1_1; right
-W 2_1 2_0; right
-W 3_0 3_1; right
-W 0_1 0; right
-W 0 0_4; down=0.1, ground
-; label_nodes=none
-"""
-
-  num_elements = 5
-
-  has_common_mode_rejection = True
-
-  @classmethod
-  def calculate_elements_from_reactance_params(cls, x11, x12, x22):
-    x1 = 2 * (x12 ** 2 - x11 * x22) / (x12 - 2 * x22)
-    x2 = x11 * x22 / x12 - x12
-    x3 = x12 - x11 * x22 / x12
-    x4 = x11 * x22 / 2 / x12 - x12 / 2
-    x5 = x22 - x12 ** 2 / x11
     return (x1, x2, x3, x4, x5)
 
 class TroughTopology(ReceiveCoilMatchingTopology):
