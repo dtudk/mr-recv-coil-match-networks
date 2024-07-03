@@ -23,6 +23,7 @@ import lc_power_match_baluns.topology
 from collections import abc
 import numpy as np
 import skrf
+from multimethod import multimethod
 
 class ReceiveCoilMatchingTopology(lc_power_match_baluns.topology.BalunTopology):
   """A matching network topology for an MR receive coil and a preamplifier
@@ -42,71 +43,214 @@ class ReceiveCoilMatchingTopology(lc_power_match_baluns.topology.BalunTopology):
     """Calculates element reactances from reactance parameters for optimal matching/decoupling/common-mode rejection
 
     Args:
-        x11 (float): X11 reactance parameter
-        x12 (float): X12 reactance parameter
-        x22 (float): X22 reactance parameter
+        x11 (float): X11 reactance parameter in Ohms
+        x12 (float): X12 reactance parameter in Ohms
+        x22 (float): X22 reactance parameter in Ohms
 
     Raises:
         NotImplementedError: If the topology has not implemented this method
 
     Returns:
-        tuple[float, ...]: The element reactances
+        tuple[float, ...]: The element reactances in Ohms
     """
     raise NotImplementedError
   
-  @classmethod
-  def calculate_preamplifier_decoupling(cls, rcoil: float, xcoil: float,
-      ramp: float, xamp: float, element_impedances: abc.Sequence[complex]) -> float:
-    """Calculates preamplifier decoupling from element impedances using the measure described by [1]
-    [1] W. Wang, V. Zhurbenko, J. D. Sánchez‐Heredia, and J. H. Ardenkjær‐Larsen, "Trade‐off between preamplifier noise figure and decoupling in MRI detectors," Magnetic Resonance in Medicine, vol. 89, no. 2, pp. 859–871, 2023. doi:10.1002/mrm.29489 
+  @multimethod
+  def calculate_input_impedance(cls, z_amp: complex, # pylint: disable=no-self-argument
+      element_impedances: abc.Sequence[complex]) -> complex:
+    """Calculates an estimate of the input impedance of the matching network
 
     Args:
-        rcoil (float): The coil resistance
-        xcoil (float): The coil reactance
-        ramp (float): The input resistance of the preamplifier
-        xamp (float): The input reactance of the preamplifier
-        element_impedances (abc.Sequence[complex]): The impedances of each element
+        z_amp (complex): The amplifier input impedance in Ohms
+        element_impedances (abc.Sequence[complex]): The impedances of each element in Ohms
 
     Returns:
-        float: The preamplifier decoupling in decibels
+        complex: The input impedance in Ohms
     """
-    twoport_s = cls.calculate_two_port_scattering_parameters(rcoil, xcoil, ramp, xamp, element_impedances, "power")
-    s11 = twoport_s[0, 0, 0]
-    decoupling = -20 * np.log10(np.abs(1 - s11))
-    return decoupling
-  
+    input_impedance = cls.calculate_input_impedance([z_amp], list(zip(element_impedances)))
+    return input_impedance[0]
+
   @classmethod
-  def calculate_noise_figure(cls, rcoil: float, xcoil: float, rout: float,
-    xout: float, fmin: float, rn: float, element_impedances: abc.Sequence[complex]) -> float:
+  @multimethod
+  def calculate_input_impedance(cls, z_amp: abc.Sequence[complex], # pylint: disable=function-redefined
+      element_impedances: abc.Sequence[abc.Sequence[complex]]) -> abc.Sequence[complex]:
+    """Calculates an estimate of the input impedance of the matching network over frequency
+
+    Args:
+        z_amp (abc.Sequence[complex]): The amplifier input impedance in Ohms over frequency
+        element_impedances (abc.Sequence[abc.Sequence[complex]]): A sequence of all elements,
+            with the inner sequence representing the impedance of an element in Ohms over frequency
+
+    Returns:
+        abc.Sequence[complex]: The input impedance in Ohms over frequency
+    """
+    amp_z = np.array(z_amp).reshape((len(z_amp), 1, 1))
+    amp_network = skrf.Network.from_z(amp_z)
+    twoport_z = cls.calculate_two_port_impedance_parameters(element_impedances) # pylint: disable=no-value-for-parameter
+    matching_network = skrf.Network.from_z(twoport_z)
+    loaded_matching_network = skrf.network.connect(amp_network, 0, matching_network, 1)
+    return loaded_matching_network.z[:, 0, 0]
+  
+  @multimethod
+  def calculate_rho_in(cls, z_coil: complex, z_amp: complex, # pylint: disable=no-self-argument
+      element_impedances: abc.Sequence[complex]) -> complex:
+    """Calculates an estimate of the power-wave reflection coefficient at the input port of the matching network
+
+    Args:
+        z_coil (complex): The coil impedance in Ohms
+        z_amp (complex): The amplifier input impedance in Ohms
+        element_impedances (abc.Sequence[complex]): The impedances of each element in Ohms
+
+    Returns:
+        complex: The power-wave reflection coefficient
+    """
+    rho_in = cls.calculate_rho_in([z_coil], [z_amp], list(zip(element_impedances)))
+    return rho_in[0]
+
+  @classmethod
+  @multimethod
+  def calculate_rho_in(cls, z_coil: abc.Sequence[complex], z_amp: abc.Sequence[complex], # pylint: disable=function-redefined
+      element_impedances: abc.Sequence[abc.Sequence[complex]]) -> abc.Sequence[complex]:
+    """Calculates an estimate of the power-wave reflection coefficient at the input port of the matching network over frequency
+
+    Args:
+        z_coil (abc.Sequence[complex]): The coil impedance in Ohms over frequency
+        z_amp (abc.Sequence[complex]): The amplifier input impedance in Ohms over frequency
+        element_impedances (abc.Sequence[abc.Sequence[complex]]): A sequence of all elements,
+            with the inner sequence representing the impedance of an element in Ohms over frequency
+
+    Returns:
+        abc.Sequence[complex]: The power-wave reflection coefficient over frequency
+    """
+    twoport_s = cls.calculate_two_port_scattering_parameters(z_coil, z_amp, element_impedances, "power") # pylint: disable=no-value-for-parameter
+    return twoport_s[:, 0, 0]
+
+  @multimethod
+  def calculate_output_impedance(cls, z_coil: complex, # pylint: disable=no-self-argument
+      element_impedances: abc.Sequence[complex]) -> complex:
+    """Calculates an estimate of the output impedance of the matching network
+
+    Args:
+        z_coil (complex): The coil impedance in Ohms
+        element_impedances (abc.Sequence[complex]): The impedances of each element in Ohms
+
+    Returns:
+        complex: The output impedance in Ohms
+    """
+    output_impedance = cls.calculate_output_impedance([z_coil], list(zip(element_impedances)))
+    return output_impedance[0]
+
+  @classmethod
+  @multimethod
+  def calculate_output_impedance(cls, z_coil: abc.Sequence[complex], # pylint: disable=function-redefined
+      element_impedances: abc.Sequence[abc.Sequence[complex]]) -> abc.Sequence[complex]:
+    """Calculates an estimate of the output impedance of the matching network over frequency
+
+    Args:
+        z_coil (abc.Sequence[complex]): The coil impedance in Ohms over frequency
+        element_impedances (abc.Sequence[abc.Sequence[complex]]): A sequence of all elements,
+            with the inner sequence representing the impedance of an element in Ohms over frequency
+
+    Returns:
+        abc.Sequence[complex]: The output impedance in Ohms over frequency
+    """
+    coil_z = np.array(z_coil).reshape((len(z_coil), 1, 1))
+    coil_network = skrf.Network.from_z(coil_z)
+    twoport_z = cls.calculate_two_port_impedance_parameters(element_impedances) # pylint: disable=no-value-for-parameter
+    matching_network = skrf.Network.from_z(twoport_z)
+    loaded_matching_network = skrf.network.connect(coil_network, 0, matching_network, 0)
+    return loaded_matching_network.z[:, 0, 0]
+  
+  @multimethod
+  def calculate_available_power_gain(cls, z_coil: complex, # pylint: disable=no-self-argument
+      element_impedances: abc.Sequence[complex]) -> float:
+    """Calculates an estimate of the available power gain of the matching network
+
+    Args:
+        z_coil (complex): The coil impedance in Ohms
+        element_impedances (abc.Sequence[complex]): The impedances of each element in Ohms
+    
+    Note: For a passive matching network, this should return a negative gain (in dB).
+        The main purpose of this method is to provide noise figure estimates for lossy matching networks.
+
+    Returns:
+        float: The available power gain in decibels
+    """
+    available_power_gain = cls.calculate_available_power_gain([z_coil], list(zip(element_impedances)))
+    return available_power_gain[0]
+
+  @classmethod
+  @multimethod
+  def calculate_available_power_gain(cls, z_coil: abc.Sequence[complex], # pylint: disable=function-redefined
+      element_impedances: abc.Sequence[abc.Sequence[complex]]) -> abc.Sequence[float]:
+    """Calculates an estimate of the available power gain of the matching network over frequency
+
+    Args:
+        z_coil (abc.Sequence[complex]): The coil impedance in Ohms over frequency
+        element_impedances (abc.Sequence[abc.Sequence[complex]]): A sequence of all elements,
+            with the inner sequence representing the impedance of an element in Ohms over frequency
+    
+    Note: The frequencies for z_coil and element_impedances are assumed to be the same
+
+    Note: For a passive matching network, this should return a negative gain (in dB).
+        The main purpose of this method is to provide noise figure estimates for lossy matching networks.
+
+    Returns:
+        abc.Sequence[float]: The available power gain in decibels over frequency
+    """
+    y_coil = 1 / np.array(z_coil)
+    y_out = 1 / np.array(cls.calculate_output_impedance(z_coil, element_impedances)) # pylint: disable=no-value-for-parameter
+    twoport_z = cls.calculate_two_port_impedance_parameters(element_impedances) # pylint: disable=no-value-for-parameter
+    matching_network = skrf.Network.from_z(twoport_z)
+    matching_network_y = matching_network.y
+    matching_network_gav = np.absolute(matching_network_y[:, 1, 0] / (matching_network_y[:, 0, 0] + y_coil)) ** 2 * np.real(y_coil) / np.real(y_out)
+    return 10 * np.log10(matching_network_gav)
+  
+  @multimethod
+  def calculate_noise_figure(cls, z_coil: complex, z_out: complex, fmin: float, rn: float, # pylint: disable=no-self-argument
+      element_impedances: abc.Sequence[complex]) -> float:
     """Calculates a noise figure estimate from element impedances
 
     Args:
-        rcoil (float): The coil resistance
-        xcoil (float): The coil reactance
-        rout (float): The output resistance of the matching network
-        xout (float): The output reactance of the matching network
+        z_coil (complex): The coil impedance in Ohms
+        z_out (complex): The optimal output impedance of the matching network in Ohms
         fmin (float): The minimum noise figure for the preamplifier in decibels
-        rn (float): The preamplifier noise resistance
-        element_impedances (abc.Sequence[complex]): The impedances of each element
-
+        rn (float): The preamplifier noise resistance in Ohms
+        element_impedances (abc.Sequence[complex]): The impedances of each element in Ohms
+      
     Returns:
         float: The noise figure in decibels
     """
-    yopt = 1 / (rout + 1j * xout)
-    zcoil = rcoil + 1j * xcoil
-    ycoil = 1 / zcoil
-    coil_z = np.array([[[zcoil]]])
-    coil_network = skrf.Network.from_z(coil_z)
-    twoport_z = cls.calculate_two_port_impedance_parameters(element_impedances)
-    matching_network = skrf.Network.from_z(twoport_z)
-    loaded_matching_network = skrf.network.connect(coil_network, 0, matching_network, 0)
-    matching_network_yout = loaded_matching_network.y[0, 0, 0]
-    matching_network_y = matching_network.y
-    matching_network_gav = np.absolute(matching_network_y[0, 1, 0] / (matching_network_y[0, 0, 0] + ycoil)) ** 2 * np.real(ycoil) / np.real(matching_network_yout)
-    fmin_linear = 10 ** (fmin / 10)
-    preamp_nf = fmin_linear + rn / np.real(matching_network_yout) * np.absolute(yopt - matching_network_yout) ** 2
-    overall_nf = preamp_nf / matching_network_gav
-    overall_nf_db = 10 * np.log10(overall_nf)
+    nf = cls.calculate_noise_figure([z_coil], [z_out], [fmin], [rn], list(zip(element_impedances)))
+    return nf[0]
+  
+  @classmethod
+  @multimethod
+  def calculate_noise_figure(cls, z_coil: abc.Sequence[complex], # pylint: disable=function-redefined
+      z_out: abc.Sequence[complex], fmin: abc.Sequence[float], rn: abc.Sequence[float],
+      element_impedances: abc.Sequence[abc.Sequence[complex]]) -> abc.Sequence[float]:
+    """Calculates a noise figure estimate from element impedances
+
+    Args:
+        z_coil (abc.Sequence[complex]): The coil impedance in Ohms over frequency
+        z_out (abc.Sequence[complex]): The optimal output impedance of the matching network in Ohms over frequency
+        fmin (fmin: abc.Sequence[float]): The minimum noise figure for the preamplifier in decibels over frequency
+        rn (abc.Sequence[float]): The preamplifier noise resistance in Ohms over frequency
+        element_impedances (abc.Sequence[abc.Sequence[complex]]): A sequence of all elements,
+            with the inner sequence representing the impedance of an element in Ohms over frequency
+
+    Note: The frequencies for z_coil, z_out, fmin, rn and element_impedances are assumed to be the same
+
+    Returns:
+        abc.Sequence[float]: The noise figure in decibels over frequency
+    """
+    y_opt = 1 / np.array(z_out)
+    matching_network_y_out = 1 / np.array(cls.calculate_output_impedance(z_coil, element_impedances)) # pylint: disable=no-value-for-parameter
+    matching_network_gav_db = cls.calculate_available_power_gain(z_coil, element_impedances) # pylint: disable=no-value-for-parameter
+    fmin_linear = 10 ** (np.array(fmin) / 10)
+    preamp_nf_lin = fmin_linear + np.array(rn) / np.real(matching_network_y_out) * np.absolute(y_opt - matching_network_y_out) ** 2
+    preamp_nf_db = 10 * np.log10(preamp_nf_lin)
+    overall_nf_db = preamp_nf_db - matching_network_gav_db
     return overall_nf_db
 
 class ExtendedBox1Topology(ReceiveCoilMatchingTopology):
@@ -452,10 +596,10 @@ W 0 0_4; down=0.1, ground
 
   @classmethod
   def calculate_elements_from_reactance_params(cls, x11, x12, x22):
-    denom = x12 ** 2 - x11 * x22
-    b11 = x22 / denom
-    b12 = -x12 / denom
-    b22 = x11 / denom
+    denominator = x12 ** 2 - x11 * x22
+    b11 = x22 / denominator
+    b12 = -x12 / denominator
+    b22 = x11 / denominator
     b1 = b11 + b12
     b2 = -b12
     b3 = b22 + b12

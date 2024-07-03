@@ -15,4 +15,4 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-"""This package contains representations of power matching baluns and relevant calculations for these networks."""
+"""This package contains representations of MRI receive coil matching networks and relevant calculations for these networks."""
