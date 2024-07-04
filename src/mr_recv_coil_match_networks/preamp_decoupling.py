@@ -32,7 +32,7 @@ class PreampDecoupling:
     Args:
         z_coil (complex): The coil impedance in Ohms
         z_out (complex): The optimal output impedance for noise-matching in Ohms
-        z_amp (complex): The preamplifier input impedance
+        z_amp (complex): The preamplifier input impedance in Ohms
     
     Raises:
         ValueError: If the inputs violate the constraints for which a noise-matching preamplifier decoupling matching network can be constructed
@@ -198,7 +198,7 @@ class LowInputImpedancePreampDecoupling(PreampDecoupling):
     Args:
         z_coil (complex): The coil impedance in Ohms
         z_out (complex): The optimal output impedance for noise-matching in Ohms
-        z_amp (complex): The preamplifier input impedance
+        z_amp (complex): The preamplifier input impedance in Ohms
     
     Raises:
         ValueError: If the inputs violate the constraints for which a noise-matching preamplifier decoupling matching network can be constructed
