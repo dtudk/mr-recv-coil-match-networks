@@ -117,7 +117,7 @@ class PreampDecoupling:
     Returns:
         float: The preamplifier decoupling in decibels
     """
-    decoupling = -20 * np.log10(np.abs(1 - rho_in * np.exp(1j * self.theta)))
+    decoupling = -20 * np.log10(np.abs(1 - rho_in * np.exp(-1j * self.theta)))
     return decoupling
   
   @cached_property
