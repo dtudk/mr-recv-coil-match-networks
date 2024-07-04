@@ -69,7 +69,7 @@ class PreampDecoupling(ABC):
     return self.__z_out
 
   @cached_property
-  def rho_out(self):
+  def rho_out(self) -> complex:
     """The power-wave reflection coefficient at the output of a noise-matched matching network
 
     Note: Should not be mutated
@@ -115,6 +115,24 @@ class PreampDecoupling(ABC):
     decoupling = -20 * np.log10(np.abs(1 - rho_in * np.exp(-1j * self.theta)))
     return decoupling
   
+  def calculate_theta_bounds(self, decoupling_bound: float) -> tuple[float, float]:
+    """Calculates the bounds of the phase of the input power-wave reflection coefficient
+    such that a given decoupling bound can still be achieved
+
+    Args:
+        decoupling_bound (float): The decoupling bound in decibels
+
+    Returns:
+        tuple[float, float]: The lower and upper bounds of the phase in radians
+    """
+    decoupling_bound_lin = 10 ** (decoupling_bound / -20)
+    x = (np.abs(self.rho_out) ** 2 + 1 - decoupling_bound_lin ** 2) / 2
+    y = np.sqrt(np.abs(self.rho_out) ** 2 - x ** 2)
+    delta_theta = np.arctan(y / x)
+    lower_theta = self.theta - delta_theta
+    upper_theta = self.theta + delta_theta
+    return (lower_theta, upper_theta)
+  
   @cached_property
   def minimum_preamplifier_decoupling(self) -> float:
     """The minimum value of preamplifier decoupling in decibels assuming a lossless matching network
@@ -135,11 +153,31 @@ class PreampDecoupling(ABC):
   
   @cached_property
   def beta(self) -> float:
-    """Rhe power standing wave ratio at the output port of a noise-matched matching network
+    """The power standing wave ratio at the output port of a noise-matched matching network
 
     Note: Should not be mutated
     """
     return (1 + np.abs(self.rho_out)) / (1 - np.abs(self.rho_out))
+  
+  def clone(self, z_coil: complex = None, z_out: complex = None, z_amp: complex = None) -> "PreampDecoupling":
+    """Clones this preamp decoupling instance with new configuration parameters
+
+    Args:
+        z_coil (complex, optional): The coil impedance in Ohms. Defaults to None.
+        z_out (complex, optional): The optimal source impedance for noise-matching in Ohms. Defaults to None.
+        z_amp (complex, optional): The amplifier input impedance in Ohms. Defaults to None.
+    
+    Note: If any arguments are not specified, the attributes for this instance are used instead.
+
+    Note: If a subclass overrides the constructor, this method must be overridden.
+
+    Returns:
+        PreampDecoupling: A clone of this instance with new configuration parameters.
+    """
+    z_coil = self.z_coil if z_coil is None else z_coil
+    z_out = self.z_out if z_out is None else z_out
+    z_amp = self.z_amp if z_amp is None else z_amp
+    return self.__class__(z_coil, z_out, z_amp)
 
 class HighInputImpedancePreampDecoupling(PreampDecoupling):
   """Represents the high input impedance preamplifier decoupling case from [1]
