@@ -19,10 +19,11 @@
 """
 
 import numpy as np
+from abc import ABC, abstractmethod
 from collections import abc
 from functools import cached_property
 
-class PreampDecoupling:
+class PreampDecoupling(ABC):
   """An abstract class for general preamplifier decoupling conditions
   """
 
@@ -75,38 +76,32 @@ class PreampDecoupling:
     """
     return (self.z_out - np.conj(self.z_amp)) / (self.z_out + self.z_amp)
 
-  @cached_property
+  @property
+  @abstractmethod
   def reactance_parameters(self) -> abc.Sequence[tuple[float, float, float]]:
     """A sequence of solutions for the reactance parameters (x11, x12, x22) for an ideal matching network in Ohm
 
     Note: Should not be mutated
-    
-    Raises:
-        NotImplementedError: If the preamp decoupling configuration has not implemented this property
     """
-    raise NotImplementedError
+    pass
   
-  @cached_property
+  @property
+  @abstractmethod
   def ideal_zin(self) -> complex:
     """The input impedance of an ideal matching network with this preamp decoupling configuration in Ohms
 
     Note: Should not be mutated
-    
-    Raises:
-        NotImplementedError: If the preamp decoupling configuration has not implemented this property
     """
-    raise NotImplementedError
+    pass
   
-  @cached_property
+  @property
+  @abstractmethod
   def theta(self) -> float:
     """The argument of the power-wave reflection coefficient at the input port of an ideal matching network in radians
 
     Note: Should not be mutated
-    
-    Raises:
-        NotImplementedError: If the preamp decoupling configuration has not implemented this property
     """
-    raise NotImplementedError
+    pass
   
   def calculate_preamplifier_decoupling(self, rho_in: complex) -> float:
     """Calculates the preamplifier decoupling
