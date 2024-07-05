@@ -128,7 +128,7 @@ class PreampDecoupling(ABC):
     decoupling_bound_lin = 10 ** (decoupling_bound / -20)
     x = (np.abs(self.rho_out) ** 2 + 1 - decoupling_bound_lin ** 2) / 2
     y = np.sqrt(np.abs(self.rho_out) ** 2 - x ** 2)
-    delta_theta = np.arctan(y / x)
+    delta_theta = np.arctan2(y, x)
     lower_theta = self.theta - delta_theta
     upper_theta = self.theta + delta_theta
     return (lower_theta, upper_theta)
