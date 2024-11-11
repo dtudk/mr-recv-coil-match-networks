@@ -34,12 +34,7 @@ class PreampDecoupling(ABC):
         z_coil (complex): The coil impedance in Ohms
         z_out (complex): The optimal output impedance for noise-matching in Ohms
         z_amp (complex): The preamplifier input impedance in Ohms
-    
-    Raises:
-        ValueError: If the inputs violate the constraints for which a noise-matching preamplifier decoupling matching network can be constructed
     """
-    if np.isclose(z_out.imag + z_amp.imag, 0) and z_amp.real > z_out.real:
-      raise ValueError("The inputs violate the constraints for which a noise-matching preamplifier decoupling matching network can be constructed")
     self.__z_coil = z_coil
     self.__z_out = z_out
     self.__z_amp = z_amp
