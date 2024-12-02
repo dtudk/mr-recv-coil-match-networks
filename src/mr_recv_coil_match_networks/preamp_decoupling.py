@@ -110,24 +110,6 @@ class PreampDecoupling(ABC):
     decoupling = -20 * np.log10(np.abs(1 - rho_in * np.exp(-1j * self.theta)))
     return decoupling
   
-  def calculate_theta_bounds(self, decoupling_bound: float) -> tuple[float, float]:
-    """Calculates the bounds of the phase of the input power-wave reflection coefficient
-    such that a given decoupling bound can still be achieved
-
-    Args:
-        decoupling_bound (float): The decoupling bound in decibels
-
-    Returns:
-        tuple[float, float]: The lower and upper bounds of the phase in radians
-    """
-    decoupling_bound_lin = 10 ** (decoupling_bound / -20)
-    x = (np.abs(self.rho_out) ** 2 + 1 - decoupling_bound_lin ** 2) / 2
-    y = np.sqrt(np.abs(self.rho_out) ** 2 - x ** 2)
-    delta_theta = np.arctan2(y, x)
-    lower_theta = self.theta - delta_theta
-    upper_theta = self.theta + delta_theta
-    return (lower_theta, upper_theta)
-  
   @cached_property
   def minimum_preamplifier_decoupling(self) -> float:
     """The minimum value of preamplifier decoupling in decibels assuming a lossless matching network
