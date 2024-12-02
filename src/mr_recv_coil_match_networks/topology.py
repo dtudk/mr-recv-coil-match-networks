@@ -20,12 +20,13 @@
 
 import lc_power_match_baluns.oneport
 import lc_power_match_baluns.topology
+from abc import abstractmethod, ABC
 from collections import abc
 import numpy as np
 import skrf
 from multimethod import multimethod
 
-class ReceiveCoilMatchingTopology(lc_power_match_baluns.topology.BalunTopology):
+class ReceiveCoilMatchingTopology(lc_power_match_baluns.topology.BalunTopology, ABC):
   """A matching network topology for an MR receive coil and a preamplifier
   
   Attributes:
@@ -38,6 +39,7 @@ class ReceiveCoilMatchingTopology(lc_power_match_baluns.topology.BalunTopology):
   has_only_one_solution: bool = False
 
   @classmethod
+  @abstractmethod
   def calculate_elements_from_reactance_params(cls, x11: float, x12: float,
       x22: float) -> tuple[float, ...]:
     """Calculates element reactances from reactance parameters for optimal matching/decoupling/common-mode rejection
