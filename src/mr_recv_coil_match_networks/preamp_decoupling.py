@@ -200,8 +200,7 @@ class LowInputImpedancePreampDecoupling(PreampDecoupling):
 
   [1] W. Wang, V. Zhurbenko, J. D. Sánchez‐Heredia, and J. H. Ardenkjær‐Larsen, "Trade‐off between preamplifier noise figure and decoupling in MRI detectors," Magnetic Resonance in Medicine, vol. 89, no. 2, pp. 859–871, 2023. doi:10.1002/mrm.29489 
   """
-  # TODO get_reactance_parameters
-  
+    
   def __init__(self, z_coil: complex, z_out: complex, z_amp: complex):
     """Constructs a low input impedance preamplifier decoupling configuration
 
