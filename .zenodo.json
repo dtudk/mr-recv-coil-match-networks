@@ -11,11 +11,23 @@
     }
   ],
 
-  "description": "This repository implements calculations for MRI receive coil matching networks to accompany the research article \"Baluns for Preamplifier Decoupling of Radio-Frequency Receive Coils\" by Rasmus Jepsen, Jan Henrik Ardenkjær-Larsen, and Vitaliy Zhurbenko (submitted). These matching networks provide noise matching, preamplifier decoupling and common-mode rejection. See the README.md file at the root of the repository for more information.",
+  "description": "This repository implements calculations for MRI receive coil matching networks to accompany the research article \"Baluns for Preamplifier Decoupling of Radio-Frequency Receive Coils\" by Rasmus Jepsen, Wenjun Wang, Lars G. Hanson, Jan Henrik Ardenkjær-Larsen, and Vitaliy Zhurbenko (submitted). These matching networks provide noise matching, preamplifier decoupling and common-mode rejection. See the README.md file at the root of the repository for more information.",
 
   "license": "lgpl-2.1-or-later",
 
   "contributors": [
+    {
+      "orcid": "0000-0001-7781-9856",
+      "affiliation": "Technical University of Denmark",
+      "name": "Wang, Wenjun",
+      "type": "Researcher"
+    },
+    {
+      "orcid": "0000-0002-8204-6912",
+      "affiliation": "Technical University of Denmark",
+      "name": "Hanson, Lars G.",
+      "type": "Researcher"
+    },
     {
       "orcid": "0000-0001-6167-6926",
       "affiliation": "Technical University of Denmark",
@@ -43,7 +55,7 @@
 
   "thesis_university": "Technical University of Denmark (DTU)",
 
-  "version": "2.0.0",
+  "version": "2.0.1",
 
   "language": "eng"
 }
