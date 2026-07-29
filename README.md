@@ -21,7 +21,7 @@ This repository also implements a Python package `mr_recv_coil_match_networks`, 
 Notebooks relating to the derivation procedure for the baluns are located in the `derivations` directory.
 
 ## Authors and acknowledgment
-This repository was created by Rasmus Jepsen for the Technical University of Denmark (DTU) to supplement the research article "Baluns for Preamplifier Decoupling of Radio-Frequency Receive Coils" by Rasmus Jepsen, Jan Henrik Ardenkjær-Larsen, and Vitaliy Zhurbenko (submitted).
+This repository was created by Rasmus Jepsen for the Technical University of Denmark (DTU) to supplement the research article "Baluns for Preamplifier Decoupling of Radio-Frequency Receive Coils" by Rasmus Jepsen, Wenjun Wang, Lars G. Hanson, Jan Henrik Ardenkjær-Larsen, and Vitaliy Zhurbenko (submitted).
 
 This project has received funding from the European Research Council (ERC) under the European Union’s Horizon 2020 research and innovation programme (grant agreement No 856432).
 
